@@ -1,2 +1,2 @@
 # Dashboard
-This repository will contain the dashboard that I will build for my DACSS 690V: Data Visualization course, taught by Dr. Jose Manuel Magallanes Reyes at UMass Amherst.
+My dashboard can be accessed at: [https://dacss-690v.github.io/Dashboard/](https://dacss-690v.github.io/Dashboard/).
