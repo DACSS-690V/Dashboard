@@ -5,5 +5,6 @@ The files included in this repository are:
 - README.md: this document
 - plotCode.R: the R script used to create a boxplot
 - uniplot.rds: the RDS file containing the boxplot
+- dashboardReferences.bib: the bibliography of sources used to contextualize the plot
 - dashboardCode.Rmd: the RMarkdown file used to generate the dashboard
 - index.html: the rendered Flexdashboard
