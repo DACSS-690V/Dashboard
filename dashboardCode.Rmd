@@ -1,24 +1,29 @@
 ---
-title: "Maura Anish Homework 1 Dashboard"
+title: "Maura Anish Homework 2 Dashboard"
 bibliography: dashboardReferences.bib
 output: 
-  flexdashboard::flex_dashboard:
-    orientation: columns
+  flexdashboard::flex_dashboard
 ---
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
+library(dplyr)
 ```
 
 ## Introduction {.sidebar}
-This dashboard is being constructed for DACSS 690V: Data Visualization, a course taught by Dr. Jose Manuel Magallanes Reyes in the Winter 2024 session at the University of Massachusetts Amherst. As of January 2, 2025, this dashboard contains one plot: a boxplot of student-teacher ratios at K-12 schools in Washington, which refers to @heckmann_ratio_2024 for additional context.
+This dashboard is being constructed for DACSS 690V: Data Visualization, a course taught by Dr. Jose Manuel Magallanes Reyes in the Winter 2025 session at the University of Massachusetts Amherst. As of January 5, 2025, this dashboard contains two plots: 1) a boxplot of student-teacher ratios at K-12 schools in Washington, which refers to @heckmann_ratio_2024 for additional context, and 2) a side-by-side boxplot of crimes committed in Massachusetts, according to the age of the perpetrator.
 
 ### References
 <div id="refs"></div>
 
-## Column {data-width="450"}
+## Column {.tabset .tabset-fade}
 
-### Numeric Univariate Plot
+### Univariate Plot
 ```{r}
 readRDS("uniplot.rds")
+```
+
+### Bivariate Plot
+```{r}
+readRDS("biplot.rds")
 ```
