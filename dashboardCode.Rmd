@@ -11,7 +11,7 @@ library(dplyr)
 ```
 
 ## Introduction {.sidebar}
-This dashboard is being constructed for DACSS 690V: Data Visualization, a course taught by Dr. Jose Manuel Magallanes Reyes in the Winter 2025 session at the University of Massachusetts Amherst. As of January 5, 2025, this dashboard contains two plots: 1) a boxplot of student-teacher ratios at K-12 schools in Washington, which refers to @heckmann_ratio_2024 for additional context, and 2) a side-by-side boxplot of crimes committed in Massachusetts, according to the age of the perpetrator.
+This dashboard is being constructed for DACSS 690V: Data Visualization, a course taught by Dr. Jose Manuel Magallanes Reyes in the Winter 2025 session at the University of Massachusetts Amherst. As of January 10, 2025, this dashboard contains two plots: 1) a boxplot of student-teacher ratios at K-12 schools in Washington, which refers to @heckmann_ratio_2024 for additional context, and 2) a side-by-side boxplot of crimes committed in Massachusetts, according to the age of the perpetrator.
 
 ### References
 <div id="refs"></div>

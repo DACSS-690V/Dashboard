@@ -90,15 +90,15 @@ ma_arrests <- rio::import("https://github.com/DACSS-Visual/tabular_bivar_catcat/
 class(ma_arrests$`Arrest Type`)
 # Arrest Type is a character variable with 4 unique values, so convert to factor
 ma_arrests <- mutate(ma_arrests, ArrestType = factor(x=`Arrest Type`, 
-                                                     levels = c('M', 'W', 'F', 'O'),
-                                                     labels = c('Misdemeanor', 'Warrant',
-                                                                'Felony', 'Other')))
+                                                     levels = c('F', 'W', 'M', 'O'),
+                                                     labels = c('Felony', 'Warrant',
+                                                                'Misdemeanor', 'Other')))
 table(ma_arrests$ArrestType)
-# Misdemeanor     Warrant      Felony       Other 
-#    5441          1706         1251         180 
-# M = Misdemeanor (less serious crime)
-# W = Warrant (arrest with permission of judge)
+# Felony     Warrant      Misdemeanor       Other 
+#  1251       1706           5441            180
 # F = Felony (more serious crime)
+# W = Warrant (arrest with permission of judge)
+# M = Misdemeanor (less serious crime)
 # O = Other
 sum(is.na(ma_arrests$ArrestType))
 # 44 NA values
@@ -120,16 +120,16 @@ hist(ma_arrests$Age)
 ma_arrests <- filter(ma_arrests, !is.na(ma_arrests$ArrestType) & 
                        !is.na(ma_arrests$Age))
 tapply(ma_arrests$Age, ma_arrests$ArrestType, summary)
-# $Misdemeanor (n=5441)
+# $Felony 
+#  Min.  1st Qu.  Median  Mean   3rd Qu.   Max. 
+# 15.00   25.00   30.00   32.71   39.00   71.00
+# $Warrant 
+#  Min.  1st Qu.  Median  Mean   3rd Qu.   Max. 
+# 17.00   27.00   33.00   34.94   41.00   74.00
+# $Misdemeanor 
 #  Min.  1st Qu.  Median  Mean   3rd Qu.   Max. 
 # 15.00   27.00   34.00   35.28   41.00   74.00 
-# $Warrant (n=1706)
-#  Min.  1st Qu.  Median  Mean   3rd Qu.   Max. 
-# 17.00   27.00   33.00   34.94   41.00   74.00 
-# $Felony (n=1251)
-#  Min.  1st Qu.  Median  Mean   3rd Qu.   Max. 
-# 15.00   25.00   30.00   32.71   39.00   71.00 
-# $Other (n=180)
+# $Other 
 #  Min.  1st Qu.  Median  Mean   3rd Qu.   Max. 
 # 19.00   28.00   35.50   37.68   46.00   74.00 
 # at a glance, the distributions of age look similar for each category
@@ -143,17 +143,25 @@ xyaxes <- basebox + scale_y_continuous(breaks = c(20, 30, 40, 50, 60, 70)) +
   labs(y = "Age (years)", x = NULL)
 # add title, subtitle, and caption
 titlescap <- xyaxes + 
-  labs(title = "Felonies Concerningly Committed by Younger Demographic than Other Types of Crimes", 
+  labs(title = "On Average, Felons are Younger than Other Criminals", 
        subtitle = "Arrests made by Massachusetts State Police between 01/01/2019 and 03/28/2020",
        caption = "Not Included: 49 Arrests With No Recorded Type or Age\nSource: Mass.gov") +
-  theme(plot.title = element_text(size=9),
+  theme(plot.title = element_text(size=11),
         plot.subtitle = element_text(size=8))
-# add annotation for number of crimes of each type
+# add annotations for median and mean ages of each category
 biplot <- titlescap + 
-  annotate(geom = 'text', label = "n = 5441", y = 18, x = 4.15, angle = 0) +
-  annotate(geom = 'text', label = "n = 1706", y = 18, x = 3.15, angle = 0) +
-  annotate(geom = 'text', label = "n = 1251", y = 18, x = 2.15, angle = 0) +
-  annotate(geom = 'text', label = "n = 180", y = 18, x = 1.15, angle = 0)
+  annotate(geom = 'text', label = 'median = 30.0 years', x = 4.15, y = 65, color = 'black') +
+  annotate(geom = 'text', label = 'median = 33.0 years', x = 3.15, y = 65, color = 'black') +
+  annotate(geom = 'text', label = 'median = 34.0 years', x = 2.15, y = 65, color = 'black') +
+  annotate(geom = 'text', label = 'median = 35.5 years', x = 1.15, y = 65, color = 'black') +
+  annotate(geom = 'segment', x = 3.62, xend = 4.38, y = 32.71, color = 'blue') +
+  annotate(geom = 'segment', x = 2.62, xend = 3.38, y = 34.94, color = 'blue') +
+  annotate(geom = 'segment', x = 1.62, xend = 2.38, y = 35.28, color = 'blue') +
+  annotate(geom = 'segment', x = 0.62, xend = 1.38, y = 37.68, color = 'blue') +
+  annotate(geom = 'text', label = 'mean = 32.71 years', x = 3.85, y = 65, color = 'blue') +
+  annotate(geom = 'text', label = 'mean = 34.94 years', x = 2.85, y = 65, color = 'blue') +
+  annotate(geom = 'text', label = 'mean = 35.28 years', x = 1.85, y = 65, color = 'blue') +
+  annotate(geom = 'text', label = 'mean = 37.68 years', x = 0.85, y = 65, color = 'blue')
 # view final plot
 biplot
 
