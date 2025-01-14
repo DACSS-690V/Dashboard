@@ -150,18 +150,18 @@ titlescap <- xyaxes +
         plot.subtitle = element_text(size=8))
 # add annotations for median and mean ages of each category
 biplot <- titlescap + 
-  annotate(geom = 'text', label = 'median = 30.0 years', x = 4.15, y = 65, color = 'black') +
-  annotate(geom = 'text', label = 'median = 33.0 years', x = 3.15, y = 65, color = 'black') +
-  annotate(geom = 'text', label = 'median = 34.0 years', x = 2.15, y = 65, color = 'black') +
-  annotate(geom = 'text', label = 'median = 35.5 years', x = 1.15, y = 65, color = 'black') +
+  annotate(geom = 'text', label = 'median = 30.0', x = 4.15, y = 65, color = 'black') +
+  annotate(geom = 'text', label = 'median = 33.0', x = 3.15, y = 65, color = 'black') +
+  annotate(geom = 'text', label = 'median = 34.0', x = 2.15, y = 65, color = 'black') +
+  annotate(geom = 'text', label = 'median = 35.5', x = 1.15, y = 65, color = 'black') +
   annotate(geom = 'segment', x = 3.62, xend = 4.38, y = 32.71, color = 'blue') +
   annotate(geom = 'segment', x = 2.62, xend = 3.38, y = 34.94, color = 'blue') +
   annotate(geom = 'segment', x = 1.62, xend = 2.38, y = 35.28, color = 'blue') +
   annotate(geom = 'segment', x = 0.62, xend = 1.38, y = 37.68, color = 'blue') +
-  annotate(geom = 'text', label = 'mean = 32.71 years', x = 3.85, y = 65, color = 'blue') +
-  annotate(geom = 'text', label = 'mean = 34.94 years', x = 2.85, y = 65, color = 'blue') +
-  annotate(geom = 'text', label = 'mean = 35.28 years', x = 1.85, y = 65, color = 'blue') +
-  annotate(geom = 'text', label = 'mean = 37.68 years', x = 0.85, y = 65, color = 'blue')
+  annotate(geom = 'text', label = 'mean = 32.71', x = 3.85, y = 65, color = 'blue') +
+  annotate(geom = 'text', label = 'mean = 34.94', x = 2.85, y = 65, color = 'blue') +
+  annotate(geom = 'text', label = 'mean = 35.28', x = 1.85, y = 65, color = 'blue') +
+  annotate(geom = 'text', label = 'mean = 37.68', x = 0.85, y = 65, color = 'blue')
 # view final plot
 biplot
 
