@@ -3,6 +3,7 @@
 library(tidyverse)
 library(ggplot2)
 library(rio)
+library(sf)
 
 ################################## PLOT 1 ##################################
 
@@ -167,3 +168,160 @@ biplot
 
 # save plot
 saveRDS(biplot, file="biplot.rds")
+
+################################## PLOT 3 ##################################
+
+# load in boston donations data
+boston_donations <- rio::import("https://github.com/DACSS-Visual/SpatialData/raw/refs/heads/main/data/BostonContrib.xlsx")
+colnames(boston_donations)
+# Date  Contributor  Address  Addressfull  City  State  Zip  Occupation  Amount  Recipient  Tender Type Description
+
+# load in boston geographic data
+boston_zips <- sf::read_sf('https://raw.githubusercontent.com/DACSS-Visual/SpatialData/refs/heads/main/data/zip_codes.json')
+colnames(boston_zips)
+# OBJECTID  ZIP5  Shape_Length  Shape_Area  shape_wkt  geometry
+
+# explore variables of interest
+# Tender
+boston_donations <- rename(boston_donations, Tender=`Tender Type Description`)
+sum(is.na(boston_donations$Tender))
+# change the 67 NA values in Tender to "Not Specified"
+boston_donations <- mutate(boston_donations, Tender = ifelse(is.na(Tender), "Not Specified", Tender))
+sort(table(boston_donations$Tender))
+# Money Order   Cash   Other   Not Specified   Transfer   Check   Credit Card 
+# 19            127    307     606             5067       7171    10667 
+
+# examine top 2 most common (check and credit card) contributions further
+check_credit_dons <- filter(boston_donations, Tender %in% c('Check', 'Credit Card'))
+nrow(check_credit_dons) # 17838
+
+# Amount
+summary(check_credit_dons$Amount)
+# Min.   1st Qu.   Median   Mean   3rd Qu.   Max. 
+# 10.00  75.0      200.0    262.9  250.0     51840.0
+boxplot(check_credit_dons$Amount)
+# there are some very high outlying donation amounts
+sum(check_credit_dons$Amount<=100) # 7813
+sum(check_credit_dons$Amount>100 & check_credit_dons$Amount<=1000) # 9976
+sum(check_credit_dons$Amount>1000) # 49
+
+# Tender & Amount
+tapply(check_credit_dons$Amount, check_credit_dons$Tender, summary)
+# $Check
+# Min.   1st Qu.   Median   Mean   3rd Qu.   Max. 
+# 10.0   100.0     200.0    300.3  500.0     51840.0 
+# $`Credit Card`
+# Min.   1st Qu.   Median   Mean   3rd Qu.   Max. 
+# 10.0   50.0      125.0    237.7  250.0     5205.1 
+# checks are used for bigger donations than credit cards
+check_credit_dons_less10k <- filter(check_credit_dons, Amount<10000)
+ggplot(check_credit_dons_less10k, aes(x=Tender, y=Amount)) + geom_boxplot()
+rm(check_credit_dons_less10k)
+
+# Zipcode
+sort(unique(boston_zips$ZIP5))
+# 37 unique zipcodes in boston zip data
+sort(unique(check_credit_dons$Zip))
+# 28 unique zipcodes in boston donation data 
+sort(setdiff(boston_zips$ZIP5, check_credit_dons$Zip))
+# no donation data for: 02021, 02026, 02151, 02152, 02163, 02186, 02203, 02459, 02467
+# Zipcode & Amount
+tapply(check_credit_dons$Amount, check_credit_dons$Zip, summary)
+# median donation amounts range from $50 to $250 by zipcode
+# Zipcode & Tender
+table(check_credit_dons$Zip, check_credit_dons$Tender)
+# credit card donations are more popular than check donations in most all zipcodes
+
+# aggregate data by zipcode and tender type, using median because of high outliers
+zip_meds <- group_by(check_credit_dons, Zip, Tender) |>
+  summarize(MedAmount = median(Amount))
+colnames(zip_meds)
+# Zip  Tender  MedAmount
+nrow(zip_meds) # 56
+
+# merge aggregated data into spatial data
+zips_dons <- left_join(boston_zips, zip_meds, by = join_by(ZIP5==Zip))
+colnames(zips_dons)
+# OBJECTID  ZIP5   Shape_Length  Shape_Area  shape_wkt  geometry  Tender  MedAmount
+nrow(zips_dons) # 71
+
+# make two rows (1 credit card, 1 check) for each zipcode that doesn't have any donation data
+no_data_zips <- filter(zips_dons, is.na(Tender))
+no_data_zips <- mutate(no_data_zips, Tender = 'Credit Card')
+zips_dons <- rbind(zips_dons, no_data_zips) 
+zips_dons <- mutate(zips_dons, Tender = ifelse(is.na(Tender), 'Check', Tender))
+table(zips_dons$Tender)
+# Check   Credit Card
+# 43      43
+# 37 unique zipcodes included, but 02467 repeats 6 times
+nrow(zips_dons) # 86
+
+# there are a variety of spellings and abbreviations for the boston districts
+table(check_credit_dons$City)
+check_credit_dons <- mutate(check_credit_dons,
+                   City = case_when(
+                     City == 'ALLSTON' ~ 'Allston',
+                     City == 'boston' | City == 'BOSTON' ~ 'Boston',
+                     City == 'BRIGHTON' ~ 'Brighton',
+                     City == 'charlestown' | City == 'CHARLESTOWN' ~ 'Charlestown',
+                     City == 'dorchester' | City == 'DORCHESTER' |
+                       City == 'Dorchester center' | City == 'DORCHESTER CENTER' |
+                       City == 'Dorchester Center' ~ 'Dorchester',
+                     City == 'E Boston' | City == 'east Boston' | City == 'EAST BOSTON' ~ 'East Boston',
+                     City == 'hyde Park' | City == 'Hyde park' | City == 'HYDE PARK' ~ 'Hyde Park',
+                     City == 'jamaica plain' | City == 'Jamaica plain' | City == 'JAMAICA PLAIN' |
+                       City == 'Jp' ~ 'Jamaica Plain',
+                     City == 'MATTAPAN' ~ 'Mattapan',
+                     City == 'roslindale' | City == 'ROSLINDALE' ~ 'Roslindale',
+                     City == 'ROXBURY' | City == 'ROXBURY CROSSING' |
+                       City == 'Roxbury Crossing' ~ 'Roxbury',
+                     City == 'S Boston' | City == 'So Boston' | City == 'SO BOSTON' |
+                       City == 'south boston' | City == 'south Boston' | City == 'SOUTH BOSTON' ~
+                       'South Boston',
+                     City == 'W Roxbury' | City == 'west roxbury' | City == 'WEST ROXBURY' ~
+                       'West Roxbury',
+                     TRUE ~ as.character(City)
+                   ))
+
+# make dataframe with zipcodes and cities other than 'Boston' only
+zip_city_names <- select(check_credit_dons, Zip, City) |> filter(City != 'Boston')
+# ensure each zipcode only has one city name associated with it
+table(zip_city_names$Zip, zip_city_names$City)
+zip_city_names <- mutate(zip_city_names, 
+                         City = case_when(
+                           Zip == '02108' ~ 'Downtown Boston',
+                           Zip == '02121' ~ 'Dorchester',
+                           Zip == '02125' ~ 'Dorchester',
+                           Zip == '02126' ~ 'Mattapan',
+                           Zip == '02136' ~ 'Hyde Park',
+                           TRUE ~ as.character(City)
+                         ))
+zip_city_names <- distinct(zip_city_names)
+nrow(zip_city_names) # 20
+# add the city information to the dataframe
+zips_dons <- left_join(zips_dons, zip_city_names, by = join_by(ZIP5==Zip))
+colnames(zips_dons)
+# OBJECTID  ZIP5   Shape_Length  Shape_Area  shape_wkt  geometry  Tender  MedAmount City
+
+# specify data to plot
+base <- ggplot(data = zips_dons) + theme_void()
+# fill districts by median amount, create one plot for check and one for credit card
+basefill <- base + geom_sf(aes(fill = MedAmount)) + facet_wrap(vars(Tender))
+# change color palette of area to be colorblind friendly
+fillcolors <- basefill + scale_fill_viridis_b(direction = -1, na.value='grey')
+# add title, subtitle, caption, legend title
+maptext <- fillcolors + 
+  labs(title = "Higher Donations Made by Check than by Credit Card in Most Regions", 
+       subtitle = "Donations Made from 01/2024 - 09/2024 to Political Individuals and Organizations in Boston, MA",
+       caption = "Source: Massachusetts Office of Campaign and Political Finance (OCPF)",
+       fill = "Median Donation\nper Zipcode ($)\n(Grey = No Data)") +
+  theme(plot.title = element_text(size=11),
+        plot.subtitle = element_text(size=8))
+# add zipcode labels to each region with median > 100
+annotated <- maptext +
+  geom_sf_text(aes(label=City), color = 'black', check_overlap = T, size = 2)
+#view final plot
+annotated
+
+# save plot
+saveRDS(annotated, file="bostonmap.rds")
