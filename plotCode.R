@@ -48,10 +48,10 @@ base <- ggplot(data=eduwa_new, aes(x=Student.Teacher.Ratio))
 basebox <- base + geom_boxplot()
 # add title, subtitle, and caption
 titlescap <- basebox +
-  labs(title = "91.2% of 2,098 K-12 Schools in Washington State Have Student Teacher Ratios Between 10.2 and 26.2", 
-       subtitle = "Only 13.3% of the Schools' Ratios are Below the 2022 U.S. National Average of 14.4 for K-12 Schools",
+  labs(title = "Only 13.3% of Student-Teacher Ratios are Below the 2022 U.S. National Average", 
+       subtitle = "Ratios Calculated at 2,098 Public and Charter K-12 Schools in Washington State",
        caption = "Not Included: 2 Schools with Ratios Over 100 (129 and 330) and 329 Schools with No Reported Ratio\nSource: U.S. Department of Education") +
-  theme(plot.title = element_text(size=9),
+  theme(plot.title = element_text(size=10),
         plot.subtitle = element_text(size=8))
 # modify axes titles and values, remove gridlines
 xyaxes <- titlescap + 
@@ -62,12 +62,10 @@ xyaxes <- titlescap +
         axis.title.x = element_blank(), 
         axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
         panel.grid = element_blank())
-# add annotations (vertical lines and corresponding text) for outliers and average
+# add annotations (vertical line and text) for outliers and average
 uniplot <- xyaxes + 
-  geom_vline(xintercept = 10.2, color='red', linetype="dotted") +  
   annotate(geom = 'text', label = "83 Low\nOutliers", 
            x = 5, y = .05, angle = 0) +
-  geom_vline(xintercept = 26.2, color='red', linetype="dotted") +
   annotate(geom = 'text', label = "102 High Outliers",
            x = 60, y = .05, angle = 0) +
   geom_vline(xintercept = 14.4, color='blue', linetype="dotted") +
@@ -298,6 +296,11 @@ zip_city_names <- mutate(zip_city_names,
                          ))
 zip_city_names <- distinct(zip_city_names)
 nrow(zip_city_names) # 20
+# only keep certain zipcodes to label on map
+zip_city_names <- filter(zip_city_names, Zip != '02116' & Zip != '02121' & Zip != '02124' & 
+                           Zip != '02125' & Zip != '02118' & Zip != '02119' & Zip != '02210')
+nrow(zip_city_names) # 13
+
 # add the city information to the dataframe
 zips_dons <- left_join(zips_dons, zip_city_names, by = join_by(ZIP5==Zip))
 colnames(zips_dons)
@@ -320,7 +323,7 @@ maptext <- fillcolors +
 # add zipcode labels to each region with median > 100
 annotated <- maptext +
   geom_sf_text(aes(label=City), color = 'black', check_overlap = T, size = 2)
-#view final plot
+# view final plot
 annotated
 
 # save plot

@@ -1,5 +1,5 @@
 ---
-title: "Maura Anish Homework 3 Dashboard"
+title: "Maura Anish Final Dashboard"
 bibliography: dashboardReferences.bib
 output: 
   flexdashboard::flex_dashboard
@@ -11,7 +11,7 @@ library(dplyr)
 ```
 
 ## Introduction {.sidebar}
-This dashboard is being constructed for DACSS 690V: Data Visualization, a course taught by Dr. Jose Manuel Magallanes Reyes in the Winter 2025 session at the University of Massachusetts Amherst. As of January 21, 2025, this dashboard contains three plots: 1) a boxplot of student-teacher ratios at K-12 schools in Washington, which refers to @heckmann_ratio_2024 for additional context, 2) a side-by-side boxplot of crimes committed in Massachusetts, according to the age of the perpetrator, and 3) a map of Boston with information about political donations made in 2024.
+This dashboard was constructed for DACSS 690V: Data Visualization, a course taught by Dr. Jose Manuel Magallanes Reyes in the Winter 2025 session at the University of Massachusetts Amherst. As of January 24, 2025, this dashboard contains three plots: 1) a boxplot of student-teacher ratios at K-12 schools in Washington, which refers to @heckmann_ratio_2024 for additional context, 2) a side-by-side boxplot of crimes committed in Massachusetts, according to the age of the perpetrator, and 3) a map of Boston with information about political donations made in 2024.
 
 ### References
 <div id="refs"></div>
